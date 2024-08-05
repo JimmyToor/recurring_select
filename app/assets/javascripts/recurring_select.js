@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
       recurring_select.call(e.target, "changed")
     }
   })
+
 })
 
 const methods = {

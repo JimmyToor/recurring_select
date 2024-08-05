@@ -17,6 +17,7 @@ class RecurringSelectDialog {
     this.daysChanged = this.daysChanged.bind(this);
     this.dateOfMonthChanged = this.dateOfMonthChanged.bind(this);
     this.weekOfMonthChanged = this.weekOfMonthChanged.bind(this);
+    this.terminationChanged = this.terminationChanged.bind(this);
     this.recurring_selector = recurring_selector;
     this.current_rule = this.recurring_selector.recurring_select('current_rule');
     this.initDialogBox();
@@ -41,9 +42,12 @@ class RecurringSelectDialog {
 
     this.mainEventInit();
     this.freqInit();
+    this.terminationInit();
     this.summaryInit();
+
     trigger(this.outer_holder, "recurring_select:dialog_opened");
     this.freq_select.focus();
+
   }
 
   cancel() {
@@ -134,9 +138,9 @@ class RecurringSelectDialog {
     interval_input.value = this.current_rule.hash.interval
     on(interval_input, "change keyup", this.intervalChanged)
 
-    if (!this.current_rule.hash.validations) { this.current_rule.hash.validations = {} };
-    if (!this.current_rule.hash.validations.day_of_month) { this.current_rule.hash.validations.day_of_month = [] };
-    if (!this.current_rule.hash.validations.day_of_week) { this.current_rule.hash.validations.day_of_week = {} };
+    if (!this.current_rule.hash.validations) { this.current_rule.hash.validations = {}; }
+    if (!this.current_rule.hash.validations.day_of_month) { this.current_rule.hash.validations.day_of_month = []; }
+    if (!this.current_rule.hash.validations.day_of_week) { this.current_rule.hash.validations.day_of_week = {}; }
     this.init_calendar_days(section);
     this.init_calendar_weeks(section);
 
@@ -156,6 +160,40 @@ class RecurringSelectDialog {
     section.style.display = 'block'
   }
 
+  terminationInit() {
+    const section = this.outer_holder.querySelector(".rs_termination_section");
+    this.until_date = section.querySelector("#rs_until_date");
+    this.until_date.flatpickr({
+      enableTime: true,
+      dateFormat: "Y-m-d H:i",
+      altInput: true,
+      altFormat: "F j, Y h:i K",
+    });
+
+    if (this.current_rule.hash && this.current_rule.hash.count) {
+      this.count_option = section.querySelector("input[name=rs_termination][value=count]");
+      this.count_option.checked = true;
+      this.occurence_count = section.querySelector("#rs_occurrence_count");
+      this.occurence_count.value = this.current_rule.hash.count;
+    } else if (this.current_rule.hash && this.current_rule.hash.until) {
+      this.until_option = section.querySelector("input[name=rs_termination][value=until]");
+      this.until_option.checked = true;
+      // IceCube::TimeUtil will serialize a TimeWithZone into a hash, such as:
+      //  {time: Thu, 04 Sep 2014 06:59:59 +0000, zone: "Pacific Time (US & Canada)"}
+      // If we're initializing from an unsaved rule, until will be a string
+      if (this.current_rule.hash.until.time) {
+        this.until_val = new Date(this.current_rule.hash.until.time);
+        this.until_date.value = (this.until_val.getFullYear() + "-" + (this.until_val.getMonth() + 1) + "-" + this.until_val.getDate() + " " + this.until_val.getHours() + ":" + this.until_val.getMinutes());
+      } else {
+        this.until_date.value = this.current_rule.hash.until;
+      }
+    } else {
+      this.never_option = section.querySelector("input[name=rs_termination][value=never]");
+      this.never_option.checked = true;
+    }
+
+    section.addEventListener("change", this.terminationChanged.bind(this));
+  }
 
   summaryInit() {
     this.summary = this.outer_holder.querySelector(".rs_summary");
@@ -212,7 +250,7 @@ class RecurringSelectDialog {
       if (Array.from(this.current_rule.hash.validations.day_of_month).includes(num)) {
         day_link.classList.add("selected");
       }
-    };
+    }
 
     // add last day of month button
     const end_of_month_link = document.createElement("a")
@@ -248,9 +286,9 @@ class RecurringSelectDialog {
           day_link.setAttribute("day", day_of_week);
           day_link.setAttribute("instance", num);
           monthly_calendar.appendChild(day_link);
-        };
+        }
       }
-    };
+    }
 
     Object.entries(this.current_rule.hash.validations.day_of_week).forEach(([key, value]) => {
       Array.from(value).forEach((instance, index) => {
@@ -278,10 +316,9 @@ class RecurringSelectDialog {
   freqChanged() {
     if (!isPlainObject(this.current_rule.hash)) { this.current_rule.hash = null; } // for custom values
 
-    if (!this.current_rule.hash) { this.current_rule.hash = {} };
+    if (!this.current_rule.hash) { this.current_rule.hash = {} }
+    this.current_rule.str = null;
     this.current_rule.hash.interval = 1;
-    this.current_rule.hash.until = null;
-    this.current_rule.hash.count = null;
     this.current_rule.hash.validations = null;
     this.content.querySelectorAll(".freq_option_section").forEach(el => el.style.display = 'none')
     this.content.querySelector("input[type=radio], input[type=checkbox]").checked = false
@@ -305,13 +342,13 @@ class RecurringSelectDialog {
         this.current_rule.hash.rule_type = "IceCube::DailyRule";
         this.current_rule.str = this.config.texts["daily"];
         this.initDailyOptions();
-    };
-    this.summaryUpdate();
+    }
+    this.summaryFetch();
   }
 
   intervalChanged(event) {
     this.current_rule.str = null;
-    if (!this.current_rule.hash) { this.current_rule.hash = {} };
+    if (!this.current_rule.hash) { this.current_rule.hash = {}; }
     this.current_rule.hash.interval = parseInt(event.currentTarget.value);
     if ((this.current_rule.hash.interval < 1) || isNaN(this.current_rule.hash.interval)) {
       this.current_rule.hash.interval = 1;
@@ -322,7 +359,7 @@ class RecurringSelectDialog {
   daysChanged(event) {
     event.target.classList.toggle("selected");
     this.current_rule.str = null;
-    if (!this.current_rule.hash) { this.current_rule.hash = {} };
+    if (!this.current_rule.hash) { this.current_rule.hash = {}; }
     this.current_rule.hash.validations = {};
     const raw_days = Array.from(this.content.querySelectorAll(".day_holder a.selected"))
       .map(el => parseInt(el.dataset.value))
@@ -334,7 +371,7 @@ class RecurringSelectDialog {
   dateOfMonthChanged(event) {
     event.target.classList.toggle("selected");
     this.current_rule.str = null;
-    if (!this.current_rule.hash) { this.current_rule.hash = {} };
+    if (!this.current_rule.hash) { this.current_rule.hash = {}; }
     this.current_rule.hash.validations = {};
     const raw_days = Array.from(this.content.querySelectorAll(".monthly_options .rs_calendar_day a.selected"))
       .map(el => {
@@ -349,7 +386,7 @@ class RecurringSelectDialog {
   weekOfMonthChanged(event) {
     event.target.classList.toggle("selected");
     this.current_rule.str = null;
-    if (!this.current_rule.hash) { this.current_rule.hash = {} };
+    if (!this.current_rule.hash) { this.current_rule.hash = {}; }
     this.current_rule.hash.validations = {};
     this.current_rule.hash.validations.day_of_month = [];
     this.current_rule.hash.validations.day_of_week = {};
@@ -357,13 +394,36 @@ class RecurringSelectDialog {
       .forEach((elm, index) => {
         const day = parseInt(elm.getAttribute("day"));
         const instance = parseInt(elm.getAttribute("instance"));
-        if (!this.current_rule.hash.validations.day_of_week[day]) { this.current_rule.hash.validations.day_of_week[day] = [] };
+        if (!this.current_rule.hash.validations.day_of_week[day]) { this.current_rule.hash.validations.day_of_week[day] = []; }
         return this.current_rule.hash.validations.day_of_week[day].push(instance);
       })
     this.summaryUpdate();
     return false;
   }
 
+  terminationChanged() {
+    this.selected_termination_type = this.outer_holder.querySelector(".rs_termination_section input[type='radio']:checked");
+    if (!this.selected_termination_type) { return; }
+    this.current_rule.str = null;
+    if (!this.current_rule.hash) { this.current_rule.hash = {}; }
+    switch (this.selected_termination_type.value) {
+      case "count":
+        this.current_rule.hash.count = parseInt(this.occurence_count ? this.occurence_count.value : this.outer_holder.querySelector("#rs_occurrence_count").value);
+        if ((this.current_rule.hash.count < 1) || isNaN(this.current_rule.hash.count)) {
+          this.current_rule.hash.count = 1;
+        }
+        this.current_rule.hash.until = null;
+        break
+      case "until":
+        this.current_rule.hash.until = this.until_date ? this.until_date.value : this.outer_holder.querySelector("#rs_until_date").value;
+        this.current_rule.hash.count = null;
+        break
+      default:
+        this.current_rule.hash.count = null;
+        this.current_rule.hash.until = null;
+    }
+    this.summaryUpdate();
+  }
 // ========================= Change callbacks ===============================
 
   template() {
@@ -381,7 +441,6 @@ class RecurringSelectDialog {
               <option value='Yearly'>${this.config.texts["yearly"]}</option> \
             </select> \
           </p> \
-          \
           <div class='daily_options freq_option_section'> \
             <p> \
               ${this.config.texts["every"]} \
@@ -400,7 +459,7 @@ class RecurringSelectDialog {
               for (let i = this.config.texts["first_day_of_week"], day_of_week = i, end = 7 + this.config.texts["first_day_of_week"], asc = this.config.texts["first_day_of_week"] <= end; asc ? i < end : i > end; asc ? i++ : i--, day_of_week = i) {
                 day_of_week = day_of_week % 7;
                 str += `<a href='#' data-value='${day_of_week}'>${this.config.texts["days_first_letter"][day_of_week]}</a>`;
-              };
+              }
 
               str += `\
             </div> \
@@ -426,6 +485,37 @@ class RecurringSelectDialog {
               ${this.config.texts["years"]} \
             </p> \
           </div> \
+          <div class='rs_termination_section'>
+            <table>
+              <tr>
+                <td>
+                  <label class='rs_termination_label'>${this.config.texts["ends"]}:</label>
+                  <label>
+                    <input type='radio' name='rs_termination' value='never' />
+                    ${this.config.texts["never"]}
+                  </label>
+                </td>
+                <tr>
+                <td>
+                  <label>
+                    <input type='radio' name='rs_termination' value='count' />
+                    ${this.config.texts["after"]}
+                    <input type='text' data-wrapper-class='ui-recurring-select' id='rs_occurrence_count' class='rs_count' value='10' size='2' />
+                    ${this.config.texts["occurrences"]}
+                  </label>
+                </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label>
+                      <input type='radio' name='rs_termination' value='until' />
+                      ${this.config.texts["on"]}
+                      <input type='text' data-wrapper-class='ui-recurring-select' class='rs_datepicker' id='rs_until_date' />
+                    </label>
+                  </td>
+                </tr>
+            </table>
+          </div>
           <p class='rs_summary'> \
             <span></span> \
           </p> \
