@@ -7,7 +7,7 @@
   a {color:black;}
   input[type=button] {
     font: small/normal Arial,sans-serif;
-    background: #F5F5F5; color: #444; border: 1px solid #ccc;
+    background: #F5F5F5; border: 1px solid #ccc;
     font-size: 11px; font-weight: bold; height: 27px; line-height: 27px; outline: none; padding: 0 8px; text-align: center;
 
     @include rounded_corners(2px);
@@ -31,21 +31,19 @@ select {
 
 .rs_dialog_holder {
   display: flex;
-  justify-content: center;
   align-items: center;
-  position: fixed;
   left:0px;
   right:0px;
   top:0px;
   bottom:0px;
-  background-color:rgba(255,255,255,0.2);
+  //background-color:rgba(255,255,255,0.2);
   z-index:50;
 
   .rs_dialog {
-    background-color:#f6f6f6;
-    border:1px solid #acacac;
-    @include shadows(1px, 3px, 8px, rgba(0,0,0,0.25));
-    @include rounded_corners(7px);
+    //background-color:#f6f6f6;
+    //border:1px solid #acacac;
+    //@include shadows(1px, 3px, 8px, rgba(0,0,0,0.25));
+    //@include rounded_corners(7px);
     min-width:200px;
     overflow:hidden;
 

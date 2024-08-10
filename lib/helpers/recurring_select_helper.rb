@@ -27,9 +27,9 @@ module RecurringSelectHelper
     def recurring_options_for_select(currently_selected_rule = nil, default_schedules = nil, options = {})
 
       options_array = []
-      blank_option_label = options[:blank_label] || I18n.t("recurring_select.not_recurring")
+      blank_option_label = options[:blank_label] || I18n.t("recurring_select.once")
       blank_option = [blank_option_label, "null"]
-      separator = [I18n.t("recurring_select.or"), {:disabled => true}]
+      separator = [I18n.t("recurring_select.or"), {disabled: true}]
 
       if default_schedules.blank?
         if currently_selected_rule.present?
@@ -39,7 +39,7 @@ module RecurringSelectHelper
           options_array << blank_option if options[:allow_blank]
         else
           options_array << blank_option
-          options_array << [I18n.t("recurring_select.set_schedule"), "custom"]
+          options_array << [I18n.t("recurring_select.repeating"), "custom"]
         end
       else
         options_array << blank_option if options[:allow_blank]
@@ -58,7 +58,6 @@ module RecurringSelectHelper
         options_array << separator
         options_array << custom_label
       end
-
       options_for_select(options_array, currently_selected_rule.to_json)
     end
 

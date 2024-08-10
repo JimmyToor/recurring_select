@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
       recurring_select.call(e.target, "changed")
     }
   })
-
 })
 
 const methods = {
@@ -21,19 +20,35 @@ const methods = {
     const str = this.querySelectorAll('option')[this.selectedIndex].textContent
     this.setAttribute('data-initial-value-hash', this.value);
     this.setAttribute('data-initial-value-str', str);
-  },
+   },
 
   changed() {
     if (this.value == "custom") {
       methods.open.call(this);
+    } else if (this.value == "null") {
+      methods.close.call(this);
     } else {
-      methods.set_initial_values.call(this);
+      methods.set_initial_values.call(this,this.querySelectorAll('option')[this.selectedIndex].textContent);
+      methods.close.call(this);
     }
+  },
+
+  close() {
+    this.setAttribute("data-recurring-select-active", false);
+    this.outer_holder = document.querySelector(".rs_dialog_holder");
+    if (this.outer_holder) {
+      const dialog = this.recurring_select_dialog;
+      if (dialog && typeof dialog.destroyCalendar === 'function') {
+        dialog.destroyCalendar();
+      }
+      this.outer_holder.remove();
+    }
+    this.recurring_select_dialog = null;
   },
 
   open() {
     this.setAttribute("data-recurring-select-active", true);
-    new RecurringSelectDialog(this);
+    this.recurring_select_dialog = new RecurringSelectDialog(this);
     this.blur();
   },
 
@@ -41,16 +56,16 @@ const methods = {
     this.querySelectorAll("option[data-custom]").forEach((el) => el.parentNode.removeChild(el) )
     const new_json_val = JSON.stringify(new_rule.hash)
 
-    // TODO: check for matching name, and replace that value if found
-
     const options = Array.from(this.querySelectorAll("option")).map(() => this.value)
     if (!options.includes(new_json_val)) {
-      methods.insert_option.apply(this, [new_rule.str, new_json_val])
+      this.selectedIndex = methods.insert_option.apply(this, [new_rule.str, new_json_val])
+    }
+    else {
+      this.value = new_json_val
     }
 
-    this.value = new_json_val
     methods.set_initial_values.apply(this)
-    this.dispatchEvent(new CustomEvent("recurring_select:save"))
+    this.options[this.selectedIndex].selected = true;
   },
 
   current_rule() {
@@ -77,13 +92,15 @@ const methods = {
     const new_option = document.createElement("option")
     new_option.setAttribute("data-custom", true);
 
-    if (new_rule_str.substr(new_rule_str.length - 1) !== "*") {
+    if (new_rule_str.substring(new_rule_str.length - 1) !== "*") {
       new_rule_str+="*";
     }
 
     new_option.textContent = new_rule_str
     new_option.value = new_rule_json
     separator.parentNode.insertBefore(new_option, separator)
+
+    return Array.from(this.options).indexOf(new_option);
   }
 };
 

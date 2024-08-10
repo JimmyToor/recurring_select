@@ -1,7 +1,9 @@
 nl:
   recurring_select:
+    once: "Eenmalig"
     not_recurring: "- niet herhalen -"
     change_schedule: "Rooster aanpassen..."
+    repeating: "Herhaling"
     set_schedule: "Rooster instellen..."
     new_custom_schedule: "Nieuw aangepast rooster..."
     custom_schedule: "Aangepast rooster..."
