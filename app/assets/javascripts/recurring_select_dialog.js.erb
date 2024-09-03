@@ -138,7 +138,7 @@ class RecurringSelectDialog {
 
     this.calendar = this.until_date.flatpickr({
       enableTime: true,
-      dateFormat: "Y-m-d H:i",
+      dateFormat: "Z",
       altInput: true,
       altFormat: "F j, Y h:i K",
     });
@@ -488,7 +488,7 @@ class RecurringSelectDialog {
                     <label>
                       <input type='radio' name='rs_termination' value='until' />
                       ${this.config.texts["until"]}
-                      <input type='text' data-wrapper-class='ui-recurring-select' class='rs_datepicker' id='rs_until_date' />
+                      <input type='text' data-wrapper-class='ui-recurring-select' class='rs_datepicker' id='rs_until_date' data-flatpickr-target="endDate" />
                     </label>
                   </td>
                 </tr>
