@@ -1,6 +1,7 @@
 en:
   recurring_select:
     once: "Once"
+    never: "Never"
     not_recurring: "- not recurring -"
     change_schedule: "Change schedule..."
     repeating: "Repeating"

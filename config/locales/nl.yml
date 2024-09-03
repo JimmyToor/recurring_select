@@ -1,6 +1,7 @@
 nl:
   recurring_select:
     once: "Eenmalig"
+    never: "Nooit"
     not_recurring: "- niet herhalen -"
     change_schedule: "Rooster aanpassen..."
     repeating: "Herhaling"
