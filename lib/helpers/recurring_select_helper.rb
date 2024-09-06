@@ -39,7 +39,7 @@ module RecurringSelectHelper
           options_array << blank_option if options[:allow_blank]
         else
           options_array << blank_option
-          options_array << [I18n.t("recurring_select.repeating"), "custom"]
+          options_array << [I18n.t("recurring_select.custom"), "custom"]
         end
       else
         options_array << blank_option if options[:allow_blank]
