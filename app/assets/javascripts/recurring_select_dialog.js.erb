@@ -136,12 +136,15 @@ class RecurringSelectDialog {
     const section = this.outer_holder.querySelector(".rs_termination_section");
     this.until_date = section.querySelector("#rs_until_date");
 
-    this.calendar = this.until_date.flatpickr({
-      enableTime: true,
-      dateFormat: "Z",
-      altInput: true,
-      altFormat: "F j, Y h:i K",
-    });
+    const initializeFlatpickr = this.recurring_selector.dataset.initializeFlatpickr !== 'false';
+    if (initializeFlatpickr) {
+      this.calendar = this.until_date.flatpickr({
+        enableTime: true,
+        dateFormat: "Z",
+        altInput: true,
+        altFormat: "F j, Y h:i K",
+      });
+    }
 
     if (this.current_rule.hash && this.current_rule.hash.count) {
       this.count_option = section.querySelector("input[name=rs_termination][value=count]");
