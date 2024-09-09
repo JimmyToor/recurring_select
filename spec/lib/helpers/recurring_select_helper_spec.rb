@@ -24,7 +24,7 @@ describe RecurringSelectHelper do
         [
           ["Weekly", IceCube::Rule.weekly.to_hash.to_json],
           ['or', {:disabled => true}],
-          ['Change schedule...', 'custom']
+          ['Custom schedule...', 'custom']
         ], IceCube::Rule.weekly.to_hash.to_json
       )
       subject.recurring_options_for_select(IceCube::Rule.weekly, [])
