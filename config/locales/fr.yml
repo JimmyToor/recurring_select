@@ -5,6 +5,7 @@ fr:
     not_recurring: "- non récurrent -"
     change_schedule: "Modifier la récurrence..."
     set_schedule: "Définir la récurrence..."
+    custom: "Personnalisé..."
     repeating: "Répétition"
     new_custom_schedule: "Nouvelle récurrence..."
     custom_schedule: "Récurrence personnalisée..."

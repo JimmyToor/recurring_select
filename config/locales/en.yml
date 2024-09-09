@@ -5,7 +5,7 @@ en:
     not_recurring: "- not recurring -"
     change_schedule: "Change schedule..."
     repeating: "Repeating"
-    custom: "Custom"
+    custom: "Custom..."
     set_schedule: "Set schedule..."
     new_custom_schedule: "New custom schedule..."
     custom_schedule: "Custom schedule..."

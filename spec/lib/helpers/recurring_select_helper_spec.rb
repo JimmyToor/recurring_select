@@ -12,7 +12,7 @@ describe RecurringSelectHelper do
       expect(subject).to receive(:options_for_select).with(
         [
           ['- not recurring -', 'null'],
-          ['Set schedule...', 'custom']
+          ['Custom...', 'custom']
         ], 'null'
       )
       subject.recurring_options_for_select
@@ -24,7 +24,7 @@ describe RecurringSelectHelper do
         [
           ["Weekly", IceCube::Rule.weekly.to_hash.to_json],
           ['or', {:disabled => true}],
-          ['Change schedule...', 'custom']
+          ['Custom...', 'custom']
         ], IceCube::Rule.weekly.to_hash.to_json
       )
       subject.recurring_options_for_select(IceCube::Rule.weekly, [])
@@ -37,7 +37,7 @@ describe RecurringSelectHelper do
           ["Weekly", IceCube::Rule.weekly.to_hash.to_json],
           ["Monthly", IceCube::Rule.monthly.to_hash.to_json],
           ['or', {:disabled => true}],
-          ['Custom schedule...', 'custom']
+          ['Custom...', 'custom']
         ], 'null'
       )
       subject.recurring_options_for_select(nil, [IceCube::Rule.weekly, IceCube::Rule.monthly])
@@ -51,7 +51,7 @@ describe RecurringSelectHelper do
           ["different", 1],
           ["Weekly", IceCube::Rule.weekly.to_hash.to_json],
           ['or', {:disabled => true}],
-          ['Custom schedule...', 'custom']
+          ['Custom...', 'custom']
         ], '1'
       )
       subject.recurring_options_for_select(1, [["different", 1], IceCube::Rule.weekly], :allow_blank => true)
