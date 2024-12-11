@@ -139,7 +139,7 @@ class RecurringSelectDialog {
     const initializeFlatpickr = this.recurring_selector.dataset.initializeFlatpickr !== 'false';
     const isInline = this.recurring_selector.dataset.isInline === 'true';
     const isStatic = this.recurring_selector.dataset.isStatic === 'true';
-    const appendToElement = this.recurring_selector.dataset.appendToElement;
+    const appendToElementId = this.recurring_selector.dataset.appendToElementId;
     if (initializeFlatpickr) {
       this.calendar = this.until_date.flatpickr({
         enableTime: true,
@@ -148,7 +148,7 @@ class RecurringSelectDialog {
         altFormat: "F j, Y h:i K",
         inline: isInline,
         static: isStatic,
-        appendTo: appendToElement,
+          appendTo: appendToElementId ? window.document.querySelector(appendToElementId) : null,
       });
     }
 
