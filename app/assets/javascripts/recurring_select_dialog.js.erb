@@ -148,7 +148,7 @@ class RecurringSelectDialog {
         altFormat: "F j, Y h:i K",
         inline: isInline,
         static: isStatic,
-          appendTo: appendToElementId ? window.document.querySelector(appendToElementId) : null,
+        ...(appendToElementId ? { appendTo: window.document.querySelector(appendToElementId) } : {})
       });
     }
 
