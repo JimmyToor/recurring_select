@@ -102,6 +102,9 @@ module RecurringSelectHelper
     def initialize(object, method, template_object, default_schedules = nil, options = {}, html_options = {})
       @default_schedules = default_schedules
       @initialize_flatpickr = options.delete(:initialize_flatpickr) { true }
+      @is_static = options.delete(:static) { false }
+      @is_inline = options.delete(:inline) { false }
+      @append_to_element = options.delete(:append_to_element) { nil }
       html_options = recurring_select_html_options(html_options)
 
       super(object, method, template_object, @default_schedules, options, html_options)
@@ -109,7 +112,7 @@ module RecurringSelectHelper
 
     def render
       option_tags = add_options(recurring_options_for_select(value, @default_schedules, @options), @options, value)
-      select_content_tag(option_tags, @options, @html_options.merge(data: { initialize_flatpickr: @initialize_flatpickr }))
+      select_content_tag(option_tags, @options, @html_options.merge(data: { initialize_flatpickr: @initialize_flatpickr, is_static: @is_static, is_inline: @is_inline, append_to_element: @append_to_element }))
     end
   end
 end
